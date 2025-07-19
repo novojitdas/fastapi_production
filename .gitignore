@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.env
+.env.*  # Optional: ignore other dotenv files like .env.dev
+
+# VS Code settings
+.vscode/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# SQLite database files
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# Alembic migration files (optional)
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# System-specific
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage.xml
+
+# Editor backup files
+*~
+*.swp
+*.bak
