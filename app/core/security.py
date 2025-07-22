@@ -11,7 +11,9 @@ load_dotenv()
 #SECRET_KEY in .env
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256" #HMAC with SHA-256.
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 #60mins expire time
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15")) #60mins expire time
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+
 
 
 #It uses bcrypt, a secure hashing algorithm.
@@ -24,9 +26,15 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password:str, hashed_password:str) -> bool:
     return pwd_context.verify(plain_password,hashed_password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
     return encoded_jwt
+
+def create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
