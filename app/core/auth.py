@@ -8,17 +8,27 @@ from app.core.deps import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
 
+def credentials_exception (message: str = "Invalid Token"):
+    raise HTTPException(status_code=401, detail=message)
+
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    credentials_exception = HTTPException(status_code=401, detail="Invalid token")
+    
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            credentials_exception()
     except JWTError:
-        raise credentials_exception
+         credentials_exception("Could not validate token")
 
     user = db.query(User).filter(User.email == email).first()
     if user is None:
-        raise credentials_exception
+        credentials_exception("User not found")
     return user
+
+def require_role(*roles):
+    def role_dependency(current_user: User = Depends(get_current_user)):
+        if current_user.role not in roles:
+            raise HTTPException(status_code=403,detail="Access Denied")
+        return current_user
+    return role_dependency
